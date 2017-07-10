@@ -366,3 +366,5 @@ DragResize.prototype.resizeHandleDrag = function(diffX, diffY) { with (this)
 
  return processed;
 }};
+
+module.export = DragResize;
