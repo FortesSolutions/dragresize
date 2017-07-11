@@ -70,10 +70,10 @@ function DragResize(myName, config)
   enabled: true,                   // Global toggle of drag/resize.
   handles: ['tl', 'tm', 'tr',
    'ml', 'mr', 'bl', 'bm', 'br'],  // Array of drag handles: top/mid/bot/right.
-  isElement: null,                 // Function ref to test for an element.
-  isHandle: null,                  // Function ref to test for move handle.
-  element: null,                   // The currently selected element.
-  handle: null,                    // Active handle reference of the element.
+  isElement: null,                 // Function ref to test for an this.element.
+  isHandle: null,                  // Function ref to test for move this.handle.
+  element: null,                   // The currently selected this.element.
+  handle: null,                    // Active this.handle reference of the this.element.
   minWidth: 10, minHeight: 10,     // Minimum pixel size of elements.
   minLeft: 0, maxLeft: 9999,       // Bounding box area, in pixels.
   minTop: 0, maxTop: 9999,
@@ -82,8 +82,8 @@ function DragResize(myName, config)
   mouseX: 0, mouseY: 0,            // Current mouse position, recorded live.
   lastMouseX: 0, lastMouseY: 0,    // Last processed mouse positions.
   mOffX: 0, mOffY: 0,              // A known offset between position & mouse.
-  elmX: 0, elmY: 0,                // Element position.
-  elmW: 0, elmH: 0,                // Element size.
+  elmX: 0, elmY: 0,                // this.element position.
+  elmW: 0, elmH: 0,                // this.element size.
   allowBlur: true,                 // Whether to allow automatic blur onclick.
   ondragfocus: null,               // Event handler functions.
   ondragstart: null,
@@ -111,67 +111,67 @@ DragResize.prototype.apply = function(node)
 };
 
 
-DragResize.prototype.select = function(newElement) { with (this)
+DragResize.prototype.select = function(newElement) {
 {
- // Selects an element for dragging.
+ // Selects an this.element for dragging.
 
- if (!document.getElementById || !enabled) return;
+ if (!document.getElementById || !this.enabled) return;
 
- // Activate and record our new dragging element.
- if (newElement && (newElement != element) && enabled)
+ // Activate and record our new dragging this.element.
+ if (newElement && (newElement != this.element) && this.enabled)
  {
-  element = newElement;
+  this.element = newElement;
   // Elevate it and give it resize handles.
-  element.style.zIndex = ++zIndex;
-  if (this.resizeHandleSet) this.resizeHandleSet(element, true);
-  // Handle (badly) right/bottom positioned elements.
-  var eCS = element.currentStyle || window.getComputedStyle(element, null);
+  this.element.style.zIndex = ++this.zIndex;
+  if (this.resizeHandleSet) this.resizeHandleSet(this.element, true);
+  // this.handle (badly) right/bottom positioned elements.
+  var eCS = this.element.currentStyle || window.getComputedStyle(this.element, null);
   if (eCS.right)
   {
-   element.style.left = element.offsetLeft + 'px';
-   element.style.right = '';
+   this.element.style.left = this.element.offsetLeft + 'px';
+   this.element.style.right = '';
   }
   if (eCS.bottom)
   {
-   element.style.top = element.offsetTop + 'px';
-   element.style.bottom = '';
+   this.element.style.top = this.element.offsetTop + 'px';
+   this.element.style.bottom = '';
   }
-  // Record element attributes for mouseMove().
-  elmX = parseInt(element.style.left);
-  elmY = parseInt(element.style.top);
-  elmW = element.clientWidth || element.offsetWidth;
-  elmH = element.clientHeight || element.offsetHeight;
-  if (ondragfocus) this.ondragfocus();
+  // Record this.element attributes for mouseMove().
+  this.elmX = parseInt(this.element.style.left);
+  this.elmY = parseInt(this.element.style.top);
+  this.elmW = this.element.clientWidth || this.element.offsetWidth;
+  this.elmH = this.element.clientHeight || this.element.offsetHeight;
+  if (this.ondragfocus) this.ondragfocus();
  }
 }};
 
 
-DragResize.prototype.deselect = function(delHandles) { with (this)
+DragResize.prototype.deselect = function(delHandles) {
 {
- // Immediately stops dragging an element. If 'delHandles' is true, this
- // remove the handles from the element and clears the element flag,
- // completely resetting the element.
+ // Immediately stops dragging an this.element. If 'delHandles' is true, this
+ // remove the handles from the this.element and clears the this.element flag,
+ // completely resetting the this.element.
 
- if (!document.getElementById || !enabled) return;
+ if (!document.getElementById || !this.enabled) return;
 
  if (delHandles)
  {
-  if (ondragblur) this.ondragblur();
-  if (this.resizeHandleSet) this.resizeHandleSet(element, false);
-  element = null;
+  if (this.ondragblur) this.ondragblur();
+  if (this.resizeHandleSet) this.resizeHandleSet(this.element, false);
+  this.element = null;
  }
 
- handle = null;
- mOffX = 0;
- mOffY = 0;
+ this.handle = null;
+ this.mOffX = 0;
+ this.mOffY = 0;
 }};
 
 
-DragResize.prototype.mouseDown = function(e) { with (this)
+DragResize.prototype.mouseDown = function(e) {
 {
  // Suitable elements are selected for drag/resize on mousedown.
  // We also initialise the resize boxes, and drag parameters like mouse position etc.
- if (!document.getElementById || !enabled) return true;
+ if (!document.getElementById || !this.enabled) return true;
 
  // Fake a mousemove for touch devices.
  if (e.touches && e.touches.length) this.mouseMove(e);
@@ -179,58 +179,58 @@ DragResize.prototype.mouseDown = function(e) { with (this)
  var elm = e.target || e.srcElement,
   newElement = null,
   newHandle = null,
-  hRE = new RegExp(myName + '-([trmbl]{2})', '');
+  hRE = new RegExp(this.myName + '-([trmbl]{2})', '');
 
  while (elm)
  {
   // Loop up the DOM looking for matching elements. Remember one if found.
   if (elm.className)
   {
-   if (!newHandle && (hRE.test(elm.className) || isHandle(elm))) newHandle = elm;
-   if (isElement(elm)) { newElement = elm; break }
+   if (!newHandle && (hRE.test(elm.className) || this.isHandle(elm))) newHandle = elm;
+   if (this.isElement(elm)) { newElement = elm; break }
   }
   elm = elm.parentNode;
  }
 
- // If this isn't on the last dragged element, call deselect(),
- // which will hide its handles and clear element.
- if (element && (element != newElement) && allowBlur) deselect(true);
+ // If this isn't on the last dragged this.element, call deselect(),
+ // which will hide its handles and clear this.element.
+ if (this.element && (this.element != newElement) && this.allowBlur) this.deselect(true);
 
- // If we have a new matching element, call select().
- if (newElement && (!element || (newElement == element)))
+ // If we have a new matching this.element, call select().
+ if (newElement && (!this.element || (newElement == this.element)))
  {
-  // Stop mouse selections if we're dragging a handle.
+  // Stop mouse selections if we're dragging a this.handle.
   if (newHandle) cancelEvent(e);
-  select(newElement, newHandle);
-  handle = newHandle;
-  if (handle && ondragstart) this.ondragstart(hRE.test(handle.className));
+  this.select(newElement, newHandle);
+  this.handle = newHandle;
+  if (this.handle && this.ondragstart) this.ondragstart(hRE.test(this.handle.className));
  }
 }};
 
 
-DragResize.prototype.mouseMove = function(e) { with (this)
+DragResize.prototype.mouseMove = function(e) {
 {
- // This continually offsets the dragged element by the difference between the
- // last recorded mouse position (mouseX/Y) and the current mouse position.
- if (!document.getElementById || !enabled) return true;
+ // This continually offsets the dragged this.element by the difference between the
+ // last recorded mouse position (this.mouseX/Y) and the current mouse position.
+ if (!document.getElementById || !this.enabled) return true;
 
  // We always record the current mouse/touch position.
  var mt = (e.touches && e.touches.length) ? e.touches[0] : e;
- mouseX = mt.pageX || mt.clientX + document.documentElement.scrollLeft;
- mouseY = mt.pageY || mt.clientY + document.documentElement.scrollTop;
+ this.mouseX = mt.pageX || mt.clientX + document.documentElement.scrollLeft;
+ this.mouseY = mt.pageY || mt.clientY + document.documentElement.scrollTop;
  // Record the relative mouse movement, in case we're dragging.
  // Add any previously stored & ignored offset to the calculations.
- var diffX = mouseX - lastMouseX + mOffX;
- var diffY = mouseY - lastMouseY + mOffY;
- mOffX = mOffY = 0;
+ var diffX = this.mouseX - this.lastMouseX + this.mOffX;
+ var diffY = this.mouseY - this.lastMouseY + this.mOffY;
+ this.mOffX = this.mOffY = 0;
  // Update last processed mouse positions.
- lastMouseX = mouseX;
- lastMouseY = mouseY;
+ this.lastMouseX = this.mouseX;
+ this.lastMouseY = this.mouseY;
 
  // That's all we do if we're not dragging anything.
- if (!handle) return true;
+ if (!this.handle) return true;
 
- // If included in the script, run the resize handle drag routine.
+ // If included in the script, run the resize this.handle drag routine.
  // Let it create an object representing the drag offsets.
  var isResize = false;
  if (this.resizeHandleDrag && this.resizeHandleDrag(diffX, diffY))
@@ -240,25 +240,25 @@ DragResize.prototype.mouseMove = function(e) { with (this)
  else
  {
   // If the resize drag handler isn't set or returns false (to indicate the drag was
-  // not on a resize handle), we must be dragging the whole element, so move that.
+  // not on a resize this.handle), we must be dragging the whole this.element, so move that.
   // Bounds check left-right...
   var dX = diffX, dY = diffY;
-  if (elmX + dX < minLeft) mOffX = (dX - (diffX = minLeft - elmX));
-  else if (elmX + elmW + dX > maxLeft) mOffX = (dX - (diffX = maxLeft - elmX - elmW));
+  if (this.elmX + dX < this.minLeft) this.mOffX = (dX - (diffX = this.minLeft - this.elmX));
+  else if (this.elmX + this.elmW + dX > this.maxLeft) this.mOffX = (dX - (diffX = this.maxLeft - this.elmX - this.elmW));
   // ...and up-down.
-  if (elmY + dY < minTop) mOffY = (dY - (diffY = minTop - elmY));
-  else if (elmY + elmH + dY > maxTop) mOffY = (dY - (diffY = maxTop - elmY - elmH));
-  elmX += diffX;
-  elmY += diffY;
+  if (this.elmY + dY < this.minTop) this.mOffY = (dY - (diffY = this.minTop - this.elmY));
+  else if (this.elmY + this.elmH + dY > this.maxTop) this.mOffY = (dY - (diffY = this.maxTop - this.elmY - this.elmH));
+  this.elmX += diffX;
+  this.elmY += diffY;
  }
 
- // Assign new info back to the element, with minimum dimensions / grid align.
- element.style.left =   (Math.round(elmX / gridX) * gridX) + 'px';
- element.style.top =    (Math.round(elmY / gridY) * gridY) + 'px';
+ // Assign new info back to the this.element, with minimum dimensions / grid align.
+ this.element.style.left =   (Math.round(this.elmX / this.gridX) * this.gridX) + 'px';
+ this.element.style.top =    (Math.round(this.elmY / this.gridY) * this.gridY) + 'px';
  if (isResize)
  {
-  element.style.width =  (Math.round(elmW / gridX) * gridX) + 'px';
-  element.style.height = (Math.round(elmH / gridY) * gridY) + 'px';
+  this.element.style.width =  (Math.round(this.elmW / this.gridX) * this.gridX) + 'px';
+  this.element.style.height = (Math.round(this.elmH / this.gridY) * this.gridY) + 'px';
  }
 
  // Evil, dirty, hackish Opera select-as-you-drag fix.
@@ -275,96 +275,97 @@ DragResize.prototype.mouseMove = function(e) { with (this)
   oDF.focus();
  }
 
- if (ondragmove) this.ondragmove(isResize);
+ if (this.ondragmove) this.ondragmove(isResize);
 
  // Stop a normal drag event.
  cancelEvent(e);
 }};
 
 
-DragResize.prototype.mouseUp = function(e) { with (this)
+DragResize.prototype.mouseUp = function(e) {
 {
  // On mouseup, stop dragging, but don't reset handler visibility.
- if (!document.getElementById || !enabled) return;
+ if (!document.getElementById || !this.enabled) return;
 
- var hRE = new RegExp(myName + '-([trmbl]{2})', '');
- if (handle && ondragend) this.ondragend(hRE.test(handle.className));
- deselect(false);
+ var hRE = new RegExp(this.myName + '-([trmbl]{2})', '');
+ if (this.handle && this.ondragend) this.ondragend(hRE.test(this.handle.className));
+ this.deselect(false);
 }};
 
 
 
 /* Resize Code -- can be deleted if you're not using it. */
 
-DragResize.prototype.resizeHandleSet = function(elm, show) { with (this)
+DragResize.prototype.resizeHandleSet = function(elm, show) {
 {
- // Either creates, shows or hides the resize handles within an element.
+ // Either creates, shows or hides the resize handles within an this.element.
 
  // If we're showing them, and no handles have been created, create 4 new ones.
- if (!elm._handle_tr)
+ if (!elm['_handle_' + this.handles[0]])
  {
-  for (var h = 0; h < handles.length; h++)
+  for (var h = 0; h < this.handles.length; h++)
   {
    // Create 4 news divs, assign each a generic + specific class.
    var hDiv = document.createElement('div');
-   hDiv.className = myName + ' ' +  myName + '-' + handles[h];
-   elm['_handle_' + handles[h]] = elm.appendChild(hDiv);
+   hDiv.className = this.myName + ' ' +  this.myName + '-' + this.handles[h];
+   elm['_handle_' + this.handles[h]] = elm.appendChild(hDiv);
   }
  }
 
  // We now have handles. Find them all and show/hide.
- for (var h = 0; h < handles.length; h++)
+ for (var h = 0; h < this.handles.length; h++)
  {
-  elm['_handle_' + handles[h]].style.visibility = show ? 'inherit' : 'hidden';
+  elm['_handle_' + this.handles[h]].style.visibility = show ? 'inherit' : 'hidden';
  }
 }};
 
 
-DragResize.prototype.resizeHandleDrag = function(diffX, diffY) { with (this)
+DragResize.prototype.resizeHandleDrag = function(diffX, diffY) {
 {
  // Passed the mouse movement amounts. This function checks to see whether the
- // drag is from a resize handle created above; if so, it changes the stored
- // elm* dimensions and mOffX/Y.
+ // drag is from a resize this.handle created above; if so, it changes the stored
+ // elm* dimensions and this.mOffX/Y.
 
- var hClass = handle && handle.className &&
-  handle.className.match(new RegExp(myName + '-([tmblr]{2})')) ? RegExp.$1 : '';
+ var hClass = this.handle && this.handle.className &&
+  this.handle.className.match(new RegExp(this.myName + '-([tmblr]{2})')) ? RegExp.$1 : '';
 
  // If the hClass is one of the resize handles, resize one or two dimensions.
  // Bounds checking is the hard bit -- basically for each edge, check that the
- // element doesn't go under minimum size, and doesn't go beyond its boundary.
+ // this.element doesn't go under minimum size, and doesn't go beyond its boundary.
  var dY = diffY, dX = diffX, processed = false;
  if (hClass.indexOf('t') >= 0)
  {
-  if (elmH - dY < minHeight) mOffY = (dY - (diffY = elmH - minHeight));
-  else if (elmY + dY < minTop) mOffY = (dY - (diffY = minTop - elmY));
-  elmY += diffY;
-  elmH -= diffY;
+  if (this.elmH - dY < this.minHeight) this.mOffY = (dY - (diffY = this.elmH - this.minHeight));
+  else if (this.elmY + dY < this.minTop) this.mOffY = (dY - (diffY = this.minTop - this.elmY));
+  this.elmY += diffY;
+  this.elmH -= diffY;
   processed = true;
  }
  if (hClass.indexOf('b') >= 0)
  {
-  if (elmH + dY < minHeight) mOffY = (dY - (diffY = minHeight - elmH));
-  else if (elmY + elmH + dY > maxTop) mOffY = (dY - (diffY = maxTop - elmY - elmH));
-  elmH += diffY;
+  if (this.elmH + dY < this.minHeight) this.mOffY = (dY - (diffY = this.minHeight - this.elmH));
+  else if (this.elmY + this.elmH + dY > this.maxTop) this.mOffY = (dY - (diffY = this.maxTop - this.elmY - this.elmH));
+  this.elmH += diffY;
   processed = true;
  }
  if (hClass.indexOf('l') >= 0)
  {
-  if (elmW - dX < minWidth) mOffX = (dX - (diffX = elmW - minWidth));
-  else if (elmX + dX < minLeft) mOffX = (dX - (diffX = minLeft - elmX));
-  elmX += diffX;
-  elmW -= diffX;
+  if (this.elmW - dX < this.minWidth) this.mOffX = (dX - (diffX = this.elmW - this.minWidth));
+  else if (this.elmX + dX < this.minLeft) this.mOffX = (dX - (diffX = this.minLeft - this.elmX));
+  this.elmX += diffX;
+  this.elmW -= diffX;
   processed = true;
  }
  if (hClass.indexOf('r') >= 0)
  {
-  if (elmW + dX < minWidth) mOffX = (dX - (diffX = minWidth - elmW));
-  else if (elmX + elmW + dX > maxLeft) mOffX = (dX - (diffX = maxLeft - elmX - elmW));
-  elmW += diffX;
+  if (this.elmW + dX < this.minWidth) this.mOffX = (dX - (diffX = this.minWidth - this.elmW));
+  else if (this.elmX + this.elmW + dX > this.maxLeft) this.mOffX = (dX - (diffX = this.maxLeft - this.elmX - this.elmW));
+  this.elmW += diffX;
   processed = true;
  }
 
  return processed;
 }};
 
-module.export = DragResize;
+export default DragResize;
+
