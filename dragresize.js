@@ -132,7 +132,7 @@ DragResize.prototype.deselect = function(delHandles) {
 	if (delHandles)
 	{
 		if (this.ondragblur) this.ondragblur();
-		if (this.resizeHandleSet) this.resizeHandleSet(this.element, false);
+		if (this.element && this.resizeHandleSet) this.resizeHandleSet(this.element, false);
 		this.element = null;
 	}
 
@@ -336,4 +336,5 @@ DragResize.prototype.resizeHandleDrag = function(diffX, diffY) {
 };
 
 export default DragResize;
+
 
