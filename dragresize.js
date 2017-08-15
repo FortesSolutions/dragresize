@@ -5,7 +5,7 @@ if (typeof addEvent != 'function')
 	var addEvent = function(o, t, f, l)
 	{
 		var d = 'addEventListener', n = 'on' + t, rO = o, rT = t, rF = f, rL = l;
-		if (o[d] && !l) return o[d](t, f, false);
+		if (o[d] && !l) return o[d](t, f, {passive: false});
 		if (!o._evts) o._evts = {};
 		if (!o._evts[t])
 		{
@@ -25,7 +25,7 @@ if (typeof addEvent != 'function')
 	var removeEvent = function(o, t, f, l)
 	{
 		var d = 'removeEventListener';
-		if (o[d] && !l) return o[d](t, f, false);
+		if (o[d] && !l) return o[d](t, f, {passive: false});
 		if (o._evts && o._evts[t] && f._i) delete o._evts[t][f._i];
 	};
 }
@@ -54,8 +54,8 @@ function DragResize(myName, config)
 			'ml', 'mr', 'bl', 'bm', 'br'],  // Array of drag handles: top/mid/bot/right.
 		allowDragging: true,             // Allow dragging of element
 		allowResizing: true,             // Allow resizing of element
-		canDelHandles: true,			 // Whether handles can be deleted, or should always show
-		canModify: null,				 // function to determine whether the given element can be modified
+		canDelHandles: true,             // Whether handles can be deleted, or should always show
+		canModify: null,                 // function to determine whether the given element can be modified
 		element: null,                   // The currently selected this.element.
 		handle: null,                    // Active this.handle reference of the this.element.
 		minWidth: 10, minHeight: 10,     // Minimum pixel size of elements.
