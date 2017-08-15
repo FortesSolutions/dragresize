@@ -54,7 +54,8 @@ function DragResize(myName, config)
 			'ml', 'mr', 'bl', 'bm', 'br'],  // Array of drag handles: top/mid/bot/right.
 		allowDragging: true,             // Allow dragging of element
 		allowResizing: true,             // Allow resizing of element
-		node: null,                      // REQUIRED: Element which should be draggable/resizable (set in .apply())
+		canDelHandles: true,			 // Whether handles can be deleted, or should always show
+		canModify: null,				 // function to determine whether the given element can be modified
 		element: null,                   // The currently selected this.element.
 		handle: null,                    // Active this.handle reference of the this.element.
 		minWidth: 10, minHeight: 10,     // Minimum pixel size of elements.
@@ -79,8 +80,7 @@ function DragResize(myName, config)
 		this[p] = (typeof config[p] == 'undefined') ? props[p] : config[p];
 };
 
-DragResize.prototype.apply = function(node) {
-	this.node = node;
+DragResize.prototype.apply = function() {
 	var obj = this;
 	addEvent(document, 'mousedown', function(e) { obj.mouseDown(e) } );
 	addEvent(document, 'mousemove', function(e) { obj.mouseMove(e) } );
@@ -129,13 +129,13 @@ DragResize.prototype.deselect = function(delHandles) {
 
 	if (!document.getElementById || !this.enabled) return;
 
-	if (delHandles)
+	if (this.canDelHandles && delHandles)
 	{
 		if (this.ondragblur) this.ondragblur();
 		if (this.element && this.resizeHandleSet) this.resizeHandleSet(this.element, false);
-		this.element = null;
 	}
 
+	this.element = null;
 	this.handle = null;
 	this.mOffX = 0;
 	this.mOffY = 0;
@@ -160,7 +160,7 @@ DragResize.prototype.mouseDown = function(e) {
 		if (!newHandle && this.allowResizing && hRE.test(elm.className)) {
 			newHandle = elm;
 		}
-		if (elm == this.node) {
+		if (this.canModify(elm)) {
 			if (!newHandle) newHandle = elm;
 			newElement = elm;
 			break;
@@ -173,7 +173,7 @@ DragResize.prototype.mouseDown = function(e) {
 	if (this.element && (this.element != newElement) && this.allowBlur) this.deselect(true);
 
 	// If we have a new matching this.element, call select().
-	if (newElement && newElement === this.node && (!this.element || (newElement == this.element)))
+	if (newElement && this.canModify(newElement) && (!this.element || (newElement == this.element)))
 	{
 		// Stop mouse selections if we're dragging a this.handle.
 		if (newHandle) cancelEvent(e);
@@ -201,7 +201,7 @@ DragResize.prototype.mouseMove = function(e) {
 	this.lastMouseY = this.mouseY;
 
 	// That's all we do if we're not dragging anything.
-	if (!this.handle || this.element !== this.node) return true;
+	if (!this.handle || !this.canModify(this.element)) return true;
 
 	// If included in the script, run the resize this.handle drag routine.
 	// Let it create an object representing the drag offsets.
@@ -260,7 +260,7 @@ DragResize.prototype.mouseUp = function(e) {
 	if (!document.getElementById || !this.enabled) return;
 
 	var hRE = new RegExp(this.myName + '-([trmbl]{2})', '');
-	if (this.handle && this.element === this.node && this.ondragend) this.ondragend(hRE.test(this.handle.className));
+	if (this.handle && this.canModify(this.element) && this.ondragend) this.ondragend(hRE.test(this.handle.className));
 	this.deselect(false);
 };
 
@@ -336,5 +336,6 @@ DragResize.prototype.resizeHandleDrag = function(diffX, diffY) {
 };
 
 export default DragResize;
+
 
 
