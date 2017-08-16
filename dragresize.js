@@ -54,8 +54,8 @@ function DragResize(myName, config)
 			'ml', 'mr', 'bl', 'bm', 'br'],  // Array of drag handles: top/mid/bot/right.
 		allowDragging: true,             // Allow dragging of element
 		allowResizing: true,             // Allow resizing of element
-		canDelHandles: true,             // Whether handles can be deleted, or should always show
-		canModify: null,                 // function to determine whether the given element can be modified
+		canDelHandles: true,			 // Whether handles can be deleted, or should always show
+		canModify: null,				 // function to determine whether the given element can be modified
 		element: null,                   // The currently selected this.element.
 		handle: null,                    // Active this.handle reference of the this.element.
 		minWidth: 10, minHeight: 10,     // Minimum pixel size of elements.
@@ -116,8 +116,8 @@ DragResize.prototype.select = function(newElement) {
 		// Record this.element attributes for mouseMove().
 		this.elmX = parseInt(this.element.style.left);
 		this.elmY = parseInt(this.element.style.top);
-		this.elmW = this.element.clientWidth || this.element.offsetWidth;
-		this.elmH = this.element.clientHeight || this.element.offsetHeight;
+		this.elmW = this.element.offsetWidth;
+		this.elmH = this.element.offsetHeight;
 		if (this.ondragfocus) this.ondragfocus();
 	}
 };
